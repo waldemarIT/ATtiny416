@@ -44,5 +44,3 @@ Educational FSM demo on ATtiny series
 
 📁 File Structure
 main.c: main project logic (FSM, setup, sleep handling)
-
-No external libraries required (only AVR headers)
