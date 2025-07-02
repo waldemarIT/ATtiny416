@@ -1,46 +1,66 @@
-# ATtiny416
-This embedded project demonstrates a low-power system implemented on the ATtiny416 microcontroller using C. The device cycles through three operational states (Sleep, Active, Monitoring) depending on button input and sensor readings, optimizing energy consumption while maintaining responsive behavior.
-🔋 Power-Efficient Finite State Machine with ATtiny416
-This embedded project demonstrates a low-power system implemented on the ATtiny416 microcontroller using C. The device cycles through three operational states (Sleep, Active, Monitoring) depending on button input and sensor readings, optimizing energy consumption while maintaining responsive behavior.
+# ATtiny416 Boozer Controller
 
-💡 Features
-Finite State Machine (FSM) with 3 distinct modes:
+This project implements a low-power embedded control system for a signaling module codenamed **Boozer**, built using an **ATtiny416** microcontroller. The controller features multi-state logic, signal control, analog voltage monitoring, and low-power operation — ideal for IoT or power-sensitive embedded applications.
 
-STATE_SLEEP: deep power-down mode with minimal consumption
+## Overview
 
-STATE_2: active LED blinking with varying patterns depending on sensor input
+The system consists of:
 
-STATE_3: monitoring mode with timed LED feedback and voltage reading
+- **State 1 (Deep Sleep):** Minimal power consumption. Awakens only when PB5 ("Charged") goes high.
+- **State 2 (Active):** Reads user input (Button, BZ_FC), powers buzzer/LED with timed patterns, monitors analog input voltage.
+- **State 3 (Post-Charge):** Begins countdown cycles with buzzer/LED, performs voltage check after 5 minutes and responds accordingly.
 
-I/O Handling using GPIOs for LEDs and pushbuttons
+Inputs and Outputs:
+| Pin    | Function        | Type         |
+|--------|-----------------|--------------|
+| PC1    | Button          | Digital (IN) |
+| PA3    | Buzzer_ON       | Digital (OUT)|
+| PA4    | LED_ON          | Digital (OUT)|
+| PB3    | BZ_FC feedback  | Digital (IN) |
+| PB4    | Power state     | Digital (IN) |
+| PB5    | Charged status  | Digital (IN) |
+| PA6    | OPAMP control   | Digital (OUT)|
+| PA7    | VoltageCAP      | Analog (IN)  |
+| PA5    | Bypass trigger  | Digital (OUT)|
+| PA0/1/2| UPDI/UART       | Debug        |
 
-Power Management with sleep modes (IDLE and POWER-DOWN)
+## State Machine
 
-Timer-based Interrupts for non-blocking execution and debouncing
+The controller operates across 3 main states:
 
-Voltage Monitoring using the built-in ADC
+- **State 1:** Deep power-down until PB5 signal detected
+- **State 2:** Activates buzzer/LED with delays and pulse logic; reacts to PB3 state
+- **State 3:** After PB5 drops low, executes timing-driven logic: LED sequences, voltage monitoring, and fallback to State 1 on conditions
 
-Sensor Input emulated via button state or pin logic level
+Voltage is read via ADC from PA7 and interpreted with 0.1 V precision. Timing is driven by hardware timers with ISR logic.
 
-⚙️ Tech Details
-Microcontroller: ATtiny416 (3.33 MHz internal clock)
+## Tech Specs
 
-Written in pure C with avr-gcc
+- MCU: ATtiny416 @ 20 MHz
+- Language: C (AVR-GCC)
+- Toolchain: Atmel Studio
+- ADC: 10-bit single-ended
+- Sleep Modes: Idle, Power-down
+- Interrupts: Timer-based ISR
+- No external libraries or RTOS used
 
-Uses:
+## How to Build
 
-ISR() to handle timer-based state updates
+1. Open the project in **Atmel Studio**
+2. Flash to ATtiny416 using UPDI
+3. Ensure external hardware matches pin layout
+4. Power at 3.3–5 V with necessary peripherals (buzzer, LEDs, buttons)
 
-Sleep library from <avr/sleep.h>
+## Future Improvements
 
-Low-level register manipulation for full control
+- Integrate accelerometer event logic (via I²C/SPI or analog triggers)
+- Add UART debug output
+- Fine-tune sleep wake-up with pin change interrupts
 
-📦 Possible Applications
-Low-power wearable sensor logic
+## Author
 
-Battery-powered automation controller
+Developed by **Vlad** — my first hands-on embedded C project. Focused on full system control logic, energy management, and real-world signal coordination.
 
-Educational FSM demo on ATtiny series
+GitHub: [your-link]  
+LinkedIn: [your-link]
 
-📁 File Structure
-main.c: main project logic (FSM, setup, sleep handling)
